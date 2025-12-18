@@ -245,9 +245,7 @@ def parse_known_args(argv):
 
   # Dedup
   parser.add_argument(
-      '--enable_dedup',
-      default='false',
-      choices=['true', 'false'])
+      '--enable_dedup', default='false', choices=['true', 'false'])
 
   known_args, pipeline_args = parser.parse_known_args(argv)
   return known_args, pipeline_args
