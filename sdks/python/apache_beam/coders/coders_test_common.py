@@ -123,6 +123,14 @@ if dataclasses is not None:
     x: int
     y: int
 
+  @dataclasses.dataclass(kw_only=True)
+  class UnInitDataClass:
+    side: int
+    area: int = dataclasses.field(init=False)
+
+    def __post_init__(self):
+      self.area = self.side ** 2
+
 
 # These tests need to all be run in the same process due to the asserts
 # in tearDownClass.
@@ -309,6 +317,7 @@ class CodersTest(unittest.TestCase):
     if dataclasses is not None:
       self.check_coder(deterministic_coder, FrozenDataClass(1, 2))
       self.check_coder(deterministic_coder, FrozenKwOnlyDataClass(c=1, d=2))
+      self.check_coder(deterministic_coder, UnInitDataClass(side=11))
 
       with self.assertRaises(TypeError):
         self.check_coder(deterministic_coder, UnFrozenDataClass(1, 2))
@@ -750,6 +759,7 @@ class CodersTest(unittest.TestCase):
         from apache_beam.coders.coders_test_common import DefinesGetAndSetState
         from apache_beam.coders.coders_test_common import FrozenDataClass
         from apache_beam.coders.coders_test_common import FrozenKwOnlyDataClass
+        from apache_beam.coders.coders_test_common import UnInitDataClass
 
 
         from apache_beam.coders import proto2_coder_test_messages_pb2 as test_message
@@ -786,7 +796,7 @@ class CodersTest(unittest.TestCase):
             ("frozen_dataclass", FrozenDataClass(1, 2)),
             ("frozen_dataclass_list", [FrozenDataClass(1, 2), FrozenDataClass(3, 4)]),
             ("frozen_kwonly_dataclass", FrozenKwOnlyDataClass(c=1, d=2)),
-            ("frozen_kwonly_dataclass_list", [FrozenKwOnlyDataClass(c=1, d=2), FrozenKwOnlyDataClass(c=3, d=4)]),
+            ("frozen_kwonly_dataclass_list", [FrozenKwOnlyDataClass(c=1, d=2), UnInitDataClass(side=3)]),
         ])
 
         compat_version = {'"'+ compat_version +'"' if compat_version else None}
